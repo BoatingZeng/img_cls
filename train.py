@@ -2,6 +2,7 @@ from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 import json
 from models import vgg16
+from keras.callbacks import ModelCheckpoint
 
 
 def train(model, train_config_path='train_config.json', test_data_dir=None, test_score_path=None, evaluate_img_num=2000):
@@ -43,14 +44,21 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, test
         batch_size=batch_size,
         class_mode='categorical')
 
+    checkpointer = ModelCheckpoint(
+        weights_path,
+        monitor='val_acc',
+        verbose=1,
+        save_best_only=True,
+        save_weights_only=True,
+        mode='max')
+
     model.fit_generator(
         train_generator,
         steps_per_epoch=num_train_samples // batch_size,
         epochs=epochs,
         validation_data=validation_generator,
-        validation_steps=num_validation_samples // batch_size)
-
-    model.save_weights(weights_path)
+        validation_steps=num_validation_samples // batch_size,
+        callbacks=[checkpointer])
 
     if test_data_dir is not None:
         print('evaluate folder: '+test_data_dir)
