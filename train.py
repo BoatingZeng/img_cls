@@ -4,7 +4,7 @@ import json
 from models import vgg16
 
 
-def train(model, train_config_path='train_config.json', test_data_dir=None, test_score_path=None):
+def train(model, train_config_path='train_config.json', test_data_dir=None, test_score_path=None, evaluate_img_num=2000):
     with open(train_config_path, 'r', encoding='utf-8') as f:
         train_config = json.load(f)
 
@@ -59,7 +59,7 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, test
             target_size=(img_height, img_width),
             batch_size=batch_size,
             class_mode='categorical')
-        score = model.evaluate_generator(test_generator)
+        score = model.evaluate_generator(test_generator, steps=evaluate_img_num // batch_size)
         print('score')
         print(score)
         if test_score_path is not None:
@@ -70,6 +70,7 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, test
 model = vgg16(weights_path='weights/vgg16_cls2.h5')
 
 # 冻结不训练的层
-for layer in model.layers[:19]:
+# vgg16各个block的分隔index: [4, 7, 11, 15, 19]
+for layer in model.layers[:15]:
     layer.trainable = False
-train(model, test_data_dir='train', test_score_path='weights/vgg16_cls2.score.txt')
+train(model, test_data_dir='../all', test_score_path='weights/vgg16_cls2.score.txt')
