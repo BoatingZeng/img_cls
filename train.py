@@ -3,9 +3,10 @@ from keras.preprocessing.image import ImageDataGenerator
 import json
 from models import vgg16
 from keras.callbacks import ModelCheckpoint
+import argparse
 
 
-def train(model, train_config_path='train_config.json', test_data_dir=None, test_score_path=None, evaluate_img_num=2000):
+def train(model, train_config_path='train_config.json', test_data_dir=None, evaluate_img_num=2000):
     with open(train_config_path, 'r', encoding='utf-8') as f:
         train_config = json.load(f)
 
@@ -61,6 +62,9 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, test
         callbacks=[checkpointer])
 
     if test_data_dir is not None:
+        # load best weights before evaluate
+        print('loading best weights to evaluate')
+        model.load_weights(weights_path)
         print('evaluate folder: '+test_data_dir)
         test_generator = test_datagen.flow_from_directory(
             test_data_dir,
@@ -70,15 +74,25 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, test
         score = model.evaluate_generator(test_generator, steps=evaluate_img_num // batch_size)
         print('score')
         print(score)
-        if test_score_path is not None:
-            with open(test_score_path, 'w', encoding='utf-8') as f:
-                f.write(str(score))
+        test_score_path = weights_path + '.score.txt'
+        with open(test_score_path, 'w', encoding='utf-8') as f:
+            f.write(str(score))
 
 
-model = vgg16(weights_path='weights/vgg16_cls2.h5')
+parser = argparse.ArgumentParser()
+parser.add_argument('-tcp', '--train_config_path', type=str, default='train_config.json')
+parser.add_argument('-cls', '--classes', type=int, default=2)
+parser.add_argument('-pwp', '--pre_weights_path', type=str, default=None)
+parser.add_argument('-tdd', '--test_data_dir', type=str, default=None)
+parser.add_argument('-fl', '--freeze_layer', type=int, default=15)
+parser.add_argument('-ein', '--evaluate_img_num', type=int, default=2000)
+
+args = parser.parse_args()
+
+model = vgg16(classes=args.classes, weights_path=args.pre_weights_path)
 
 # 冻结不训练的层
 # vgg16各个block的分隔index: [4, 7, 11, 15, 19]
-for layer in model.layers[:15]:
+for layer in model.layers[:args.freeze_layer]:
     layer.trainable = False
-train(model, test_data_dir='../all', test_score_path='weights/vgg16_cls2.score.txt')
+train(model, train_config_path=args.train_config_path, test_data_dir=args.test_data_dir, evaluate_img_num=args.evaluate_img_num)

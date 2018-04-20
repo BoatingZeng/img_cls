@@ -15,7 +15,7 @@ def vgg16(input_shape=(224, 224, 3), classes=2, weights_path=None):
     x = Dropout(0.5)(x)
     x = Dense(classes, activation='softmax', name='predictions_cls'+str(classes))(x)
 
-    model = Model(inputs=base_model.input, outputs=x)
+    model = Model(inputs=base_model.input, outputs=x, name='vgg16_cls'+str(classes))
     if weights_path is not None:
         print('load weights from: '+weights_path)
         model.load_weights(weights_path)
@@ -35,7 +35,7 @@ def resnet50(input_shape=(224, 224, 3), classes=2, weights_path=None):
     x = Dropout(0.5)(x)
     x = Dense(classes, activation='softmax', name='predictions_cls'+str(classes))(x)
 
-    model = Model(inputs=base_model.input, outputs=x)
+    model = Model(inputs=base_model.input, outputs=x, name='resnet50_cls'+str(classes))
     if weights_path is not None:
         print('load weights from: ' + weights_path)
         model.load_weights(weights_path)
