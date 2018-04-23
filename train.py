@@ -1,9 +1,10 @@
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 import json
-from models import vgg16
 from keras.callbacks import ModelCheckpoint
 import argparse
+
+from models import vgg16
 
 
 def train(model, train_config_path='train_config.json', test_data_dir=None, evaluate_img_num=2000):
