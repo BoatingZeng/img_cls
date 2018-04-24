@@ -9,5 +9,8 @@
   "num_train_samples": 2000,
   "num_validation_samples": 800,
   "epochs": 1,
-  "weights_path": "weights/vgg16_cls2.h5"
+  "weights_path": "weights/vgg16_cls2.h5",
+  "model_type": "vgg16",
+  "class_num": 2,
+  "class_weight": {"0": 1.0, "1": 1.0}
 }

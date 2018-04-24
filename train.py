@@ -3,14 +3,12 @@ from keras.preprocessing.image import ImageDataGenerator
 import json
 from keras.callbacks import ModelCheckpoint
 import argparse
+import os
 
 from models import vgg16
 
 
-def train(model, train_config_path='train_config.json', test_data_dir=None, evaluate_img_num=2000):
-    with open(train_config_path, 'r', encoding='utf-8') as f:
-        train_config = json.load(f)
-
+def train(model, train_config):
     lr = train_config['lr']
     momentum = train_config['momentum']
     train_data_dir = train_config['train_data_dir']
@@ -22,6 +20,7 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, eval
     num_validation_samples = train_config['num_validation_samples']
     epochs = train_config['epochs']
     weights_path = train_config['weights_path']
+    class_weight = train_config['class_weight']
 
     sgd = SGD(lr=lr, momentum=momentum)
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
@@ -60,40 +59,33 @@ def train(model, train_config_path='train_config.json', test_data_dir=None, eval
         epochs=epochs,
         validation_data=validation_generator,
         validation_steps=num_validation_samples // batch_size,
-        callbacks=[checkpointer])
-
-    if test_data_dir is not None:
-        # load best weights before evaluate
-        print('loading best weights to evaluate')
-        model.load_weights(weights_path)
-        print('evaluate folder: '+test_data_dir)
-        test_generator = test_datagen.flow_from_directory(
-            test_data_dir,
-            target_size=(img_height, img_width),
-            batch_size=batch_size,
-            class_mode='categorical')
-        score = model.evaluate_generator(test_generator, steps=evaluate_img_num // batch_size)
-        print('score')
-        print(score)
-        test_score_path = weights_path + '.score.txt'
-        with open(test_score_path, 'w', encoding='utf-8') as f:
-            f.write(str(score))
+        callbacks=[checkpointer],
+        class_weight=class_weight)
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-tcp', '--train_config_path', type=str, default='train_config.json')
-parser.add_argument('-cls', '--classes', type=int, default=2)
-parser.add_argument('-pwp', '--pre_weights_path', type=str, default=None)
-parser.add_argument('-tdd', '--test_data_dir', type=str, default=None)
 parser.add_argument('-fl', '--freeze_layer', type=int, default=15)
-parser.add_argument('-ein', '--evaluate_img_num', type=int, default=2000)
 
 args = parser.parse_args()
 
-model = vgg16(classes=args.classes, weights_path=args.pre_weights_path)
+with open(args.train_config_path, 'r', encoding='utf-8') as f:
+    train_config = json.load(f)
 
-# 冻结不训练的层
-# vgg16各个block的分隔index: [4, 7, 11, 15, 19]
-for layer in model.layers[:args.freeze_layer]:
-    layer.trainable = False
-train(model, train_config_path=args.train_config_path, test_data_dir=args.test_data_dir, evaluate_img_num=args.evaluate_img_num)
+model_type = train_config['model_type']
+
+if os.path.exists(train_config['weights_path']):
+    weights_path = train_config['weights_path']
+else:
+    weights_path = None
+
+if model_type == 'vgg16':
+    model = vgg16(class_num=train_config['class_num'], weights_path=weights_path)
+    # 冻结不训练的层
+    # vgg16各个block的分隔index: [4, 7, 11, 15, 19]
+    for layer in model.layers[:args.freeze_layer]:
+        layer.trainable = False
+else:
+    raise ValueError('model_type error!')
+
+train(model, train_config=train_config)
