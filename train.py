@@ -5,7 +5,7 @@ from keras.callbacks import ModelCheckpoint
 import argparse
 import os
 
-from models import vgg16
+from models import vgg16, resnet50
 
 
 def train(model, train_config):
@@ -84,6 +84,11 @@ if model_type == 'vgg16':
     # 冻结不训练的层
     # vgg16各个block的分隔index: [4, 7, 11, 15, 19]
     for layer in model.layers[:args.freeze_layer]:
+        layer.trainable = False
+elif model_type == 'resnet50':
+    model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
+    # 174
+    for layer in model.layers[:174]:
         layer.trainable = False
 else:
     raise ValueError('model_type error!')
