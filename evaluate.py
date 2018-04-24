@@ -3,7 +3,7 @@ import json
 import argparse
 import os
 
-from models import vgg16
+from models import vgg16, resnet50
 
 
 def evaluate(model, train_config, test_data_dir, evaluate_img_num, batch_size):
@@ -51,6 +51,8 @@ else:
 
 if model_type == 'vgg16':
     model = vgg16(class_num=train_config['class_num'], weights_path=weights_path)
+elif model_type == 'resnet50':
+    model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
 else:
     raise ValueError('model_type error!')
 

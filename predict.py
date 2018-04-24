@@ -4,7 +4,7 @@ import argparse
 import os
 import pandas as pd
 
-from models import vgg16
+from models import vgg16, resnet50
 
 
 def predict(model, train_config, predict_data_dir, num_predict_samples, batch_size):
@@ -49,9 +49,16 @@ args = parser.parse_args()
 with open(args.train_config_path, 'r', encoding='utf-8') as f:
     train_config = json.load(f)
 
+if os.path.exists(train_config['weights_path']):
+    weights_path = train_config['weights_path']
+else:
+    raise ValueError('weights_path not exit!')
+
 model_type = train_config['model_type']
 if model_type == 'vgg16':
-    model = vgg16(classes=train_config['class_num'], weights_path=train_config['weights_path'])
+    model = vgg16(classes=train_config['class_num'], weights_path=weights_path)
+elif model_type == 'resnet50':
+    model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
 else:
     raise ValueError('model_type error!')
 
