@@ -10,10 +10,10 @@ def vgg16(input_shape=(224, 224, 3), class_num=2, weights_path=None):
         weights = None
     base_model = VGG16(weights=weights, include_top=False, input_shape=input_shape)
 
-    x = Flatten(name='flatten')(base_model.output)
-    x = Dense(256, activation='relu', name='fc_cls'+str(class_num))(x)
+    x = Flatten(name='output_flatten')(base_model.output)
+    x = Dense(256, activation='relu', name='output_fc_cls'+str(class_num))(x)
     x = Dropout(0.5)(x)
-    x = Dense(class_num, activation='softmax', name='predictions_cls'+str(class_num))(x)
+    x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(x)
 
     model = Model(inputs=base_model.input, outputs=x, name='vgg16_cls'+str(class_num))
     if weights_path is not None:
@@ -30,8 +30,8 @@ def resnet50(input_shape=(224, 224, 3), class_num=2, weights_path=None):
         weights = None
     base_model = ResNet50(weights=weights, include_top=False, input_shape=input_shape)
 
-    x = Flatten(name='flatten')(base_model.output)
-    x = Dense(class_num, activation='softmax', name='predictions_cls'+str(class_num))(x)
+    x = Flatten(name='output_flatten')(base_model.output)
+    x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(x)
 
     model = Model(inputs=base_model.input, outputs=x, name='resnet50_cls'+str(class_num))
     if weights_path is not None:

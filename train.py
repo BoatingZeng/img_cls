@@ -65,7 +65,6 @@ def train(model, train_config):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-tcp', '--train_config_path', type=str, default='train_config.json')
-parser.add_argument('-fl', '--freeze_layer', type=int, default=15)
 
 args = parser.parse_args()
 
@@ -82,14 +81,28 @@ else:
 if model_type == 'vgg16':
     model = vgg16(class_num=train_config['class_num'], weights_path=weights_path)
     # 冻结不训练的层
-    # vgg16各个block的分隔index: [4, 7, 11, 15, 19]
-    for layer in model.layers[:args.freeze_layer]:
+    for layer in model.layers:
+        if layer.name.find('output') == 0:
+            # 不冻结输出层
+            continue
+        if not train_config['just_train_output'] and layer.name.find('block5') == 0:
+            # 不冻结block5
+            continue
+
         layer.trainable = False
+
 elif model_type == 'resnet50':
     model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
-    # 174
-    for layer in model.layers[:174]:
+    for layer in model.layers:
+        if layer.name.find('output') == 0:
+            # 不冻结输出层
+            continue
+        if not train_config['just_train_output'] and (layer.name.find('res5') == 0 or layer.name.find('bn') == 0):
+            # stage 5 的层不冻结，batch normalization 层全部不冻结
+            continue
+
         layer.trainable = False
+
 else:
     raise ValueError('model_type error!')
 

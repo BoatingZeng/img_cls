@@ -7,10 +7,7 @@ import pandas as pd
 from models import vgg16
 
 
-def predict(model, train_config_path, predict_data_dir, num_predict_samples, batch_size):
-    with open(train_config_path, 'r', encoding='utf-8') as f:
-        train_config = json.load(f)
-
+def predict(model, train_config, predict_data_dir, num_predict_samples, batch_size):
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
@@ -44,12 +41,18 @@ def predict(model, train_config_path, predict_data_dir, num_predict_samples, bat
 parser = argparse.ArgumentParser()
 parser.add_argument('-tcp', '--train_config_path', type=str, default='train_config.json')
 parser.add_argument('-pdd', '--predict_data_dir', type=str, default=None)
-parser.add_argument('-cls', '--classes', type=int, default=2)
-parser.add_argument('-pwp', '--pre_weights_path', type=str, default=None)
 parser.add_argument('-nps', '--num_predict_samples', type=int, default=64)
 parser.add_argument('-bs', '--batch_size', type=int, default=2)
 
 args = parser.parse_args()
 
-model = vgg16(classes=args.classes, weights_path=args.pre_weights_path)
-predict(model, args.train_config_path, args.predict_data_dir, args.num_predict_samples, args.batch_size)
+with open(args.train_config_path, 'r', encoding='utf-8') as f:
+    train_config = json.load(f)
+
+model_type = train_config['model_type']
+if model_type == 'vgg16':
+    model = vgg16(classes=train_config['class_num'], weights_path=train_config['weights_path'])
+else:
+    raise ValueError('model_type error!')
+
+predict(model, train_config, args.predict_data_dir, args.num_predict_samples, args.batch_size)

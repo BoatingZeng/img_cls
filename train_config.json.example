@@ -12,5 +12,6 @@
   "weights_path": "weights/vgg16_cls2.h5",
   "model_type": "vgg16",
   "class_num": 2,
-  "class_weight": [1.0, 1.0]
+  "class_weight": [1.0, 1.0],
+  "just_train_output": false
 }
