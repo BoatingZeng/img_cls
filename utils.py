@@ -2,6 +2,8 @@ import shutil
 import os
 import random
 import pandas as pd
+import cv2, glob
+import numpy as np
 
 
 # import and use in python console
@@ -64,3 +66,44 @@ def split_dia_data(src, des, lable_path):
         if os.path.exists(src_img_path):
             des_img_path = os.path.join(des, cls, img_name)
             shutil.move(src_img_path, des_img_path)
+
+
+def scaleRadius(img, scale):
+    x = img[img.shape[0]//2, :, :].sum(1)
+    r = (x > x.mean()/10).sum()/2
+    s = scale * 1.0 / r
+    return cv2.resize(img, (0, 0), fx=s, fy=s)
+
+
+def preprocess_img(src, des, scale=300):
+    if len(os.listdir(des)) != 0:
+        print('{0} is not empty'.format(des))
+        return
+
+    classes = os.listdir(src)
+
+    for cls in classes:
+        old_class_dir = os.path.join(src, cls)
+        new_class_dir = os.path.join(des, cls)
+        os.mkdir(new_class_dir)
+        for f in glob.glob(os.path.join(old_class_dir, '*.jpeg')):
+            try:
+                a = cv2.imread(f)
+                # scale img to a given radius
+                a = scaleRadius(a, scale)
+                # subtract local mean color
+                a = cv2.addWeighted(a, 4, cv2.GaussianBlur(a, (0, 0), scale/30), -4, 128)
+                # remove outer 10%
+                b = np.zeros(a.shape)
+                cv2.circle(b, (a.shape[1]//2, a.shape[0]//2), int(scale * 0.9), (1, 1, 1), -1, 8, 0)
+                a = a*b+128*(1-b)
+                # to square
+                height = a.shape[0]
+                width = a.shape[1]
+                a = a[:, (width-height)//2:(width+height)//2, :]
+                basename = os.path.basename(f)
+                newpath = os.path.join(new_class_dir, basename)
+                cv2.imwrite(newpath, a)
+            except:
+                print(f)
+

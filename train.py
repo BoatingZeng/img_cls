@@ -26,6 +26,7 @@ def train(model, train_config):
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
     train_datagen = ImageDataGenerator(
+        rotation_range=360,  # 用于眼球图片
         rescale=1. / 255,
         shear_range=0.2,
         zoom_range=0.2,
