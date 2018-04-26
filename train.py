@@ -80,7 +80,7 @@ else:
     weights_path = None
 
 if model_type == 'vgg16':
-    model = vgg16(class_num=train_config['class_num'], weights_path=weights_path)
+    model = vgg16(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
     # 冻结不训练的层
     for layer in model.layers:
         if layer.name.find('output') == 0:
@@ -93,7 +93,7 @@ if model_type == 'vgg16':
         layer.trainable = False
 
 elif model_type == 'resnet50':
-    model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
+    model = resnet50(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
     for layer in model.layers:
         if layer.name.find('output') == 0:
             # 不冻结输出层

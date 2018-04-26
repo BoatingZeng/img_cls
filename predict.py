@@ -104,9 +104,9 @@ else:
 
 model_type = train_config['model_type']
 if model_type == 'vgg16':
-    model = vgg16(classes=train_config['class_num'], weights_path=weights_path)
+    model = vgg16(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
 elif model_type == 'resnet50':
-    model = resnet50(class_num=train_config['class_num'], weights_path=weights_path)
+    model = resnet50(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
 else:
     raise ValueError('model_type error!')
 
