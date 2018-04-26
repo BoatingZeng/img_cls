@@ -22,7 +22,7 @@ def train(model, train_config):
     weights_path = train_config['weights_path']
     class_weight = train_config['class_weight']
 
-    sgd = SGD(lr=lr, momentum=momentum)
+    sgd = SGD(lr=lr, momentum=momentum, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
     train_datagen = ImageDataGenerator(
@@ -48,11 +48,11 @@ def train(model, train_config):
 
     checkpointer = ModelCheckpoint(
         weights_path,
-        monitor='val_acc',
+        monitor='val_loss',
         verbose=1,
         save_best_only=True,
         save_weights_only=True,
-        mode='max')
+        mode='min')
 
     model.fit_generator(
         train_generator,

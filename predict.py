@@ -39,6 +39,11 @@ def predict_driver(model, train_config, predict_data_dir, num_predict_samples, b
 
 
 def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples, batch_size, result_path):
+    if len(os.listdir(predict_data_dir)) == train_config['class_num']:
+        has_true_class = True
+    else:
+        has_true_class = False
+
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
@@ -59,15 +64,23 @@ def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples,
 
     filenames = predict_generator.filenames
     img_names = []
+    true_cls_list = []
     for i in range(num_predict_samples):
         path_name = filenames[i]
         name = os.path.basename(path_name)
+        if has_true_class:
+            true_class = int(os.path.basename(os.path.dirname(path_name)))
+            true_cls_list.append(true_class)
         # 不要后缀
         name, _ = os.path.splitext(name)
         img_names.append(name)
 
     re_frame['image'] = img_names
     header = ['image', 'level']
+    if has_true_class:
+        re_frame['true_class'] = true_cls_list
+        header.append('true_class')
+
     re_frame = re_frame[header]
     re_frame.to_csv(result_path, index=False)
 
