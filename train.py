@@ -86,20 +86,48 @@ if model_type == 'vgg16':
         if layer.name.find('output') == 0:
             # 不冻结输出层
             continue
-        if not train_config['just_train_output'] and layer.name.find('block5') == 0:
-            # 不冻结block5
+        # train_config['train_layers'] 可选 ["block1", "block2", "block3", "block4", "block5"]
+        is_match = False
+        for block_name in train_config['train_layers']:
+            if layer.name.find(block_name) == 0:
+                # 不冻结train_layers中设置的block
+                is_match = True
+                break
+        if is_match:
             continue
 
         layer.trainable = False
 
 elif model_type == 'resnet50':
     model = resnet50(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
+    # train_config['train_layers'] 可选 ["stage1", "stage2", "stage3", "stage4", "stage5"]
+    train_layer = train_config['train_layers']
+    prefix_list = []
+    if 'stage1' in train_layer:
+        prefix_list.append('conv1')
+    if 'stage2' in train_layer:
+        prefix_list.append('res2')
+    if 'stage3' in train_layer:
+        prefix_list.append('res3')
+    if 'stage4' in train_layer:
+        prefix_list.append('res4')
+    if 'stage5' in train_layer:
+        prefix_list.append('res5')
+
     for layer in model.layers:
         if layer.name.find('output') == 0:
             # 不冻结输出层
             continue
-        if not train_config['just_train_output'] and (layer.name.find('res5') == 0 or layer.name.find('bn') == 0):
-            # stage 5 的层不冻结，batch normalization 层全部不冻结
+        if layer.name.find('bn') == 0:
+            # batch normalization 层不可以冻结
+            continue
+
+        is_match = False
+        for p in prefix_list:
+            if layer.name.find(p) == 0:
+                is_match = True
+                break
+        if is_match:
             continue
 
         layer.trainable = False
