@@ -32,7 +32,7 @@ def train(model, train_config):
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True)
-
+    # samplewise_center=True 是整张图片所有通道均值是0
     test_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     train_generator = train_datagen.flow_from_directory(
