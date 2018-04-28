@@ -11,7 +11,7 @@ def evaluate(model, train_config, test_data_dir, evaluate_img_num, batch_size):
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    test_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     # load best weights before evaluate
     print('loading best weights to evaluate')

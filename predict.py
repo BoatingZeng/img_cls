@@ -11,7 +11,7 @@ def predict_driver(model, train_config, predict_data_dir, num_predict_samples, b
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
-    predict_datagen = ImageDataGenerator(rescale=1. / 255)
+    predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     predict_generator = predict_datagen.flow_from_directory(
         predict_data_dir,
@@ -47,7 +47,7 @@ def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples,
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
-    predict_datagen = ImageDataGenerator(rescale=1. / 255)
+    predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     predict_generator = predict_datagen.flow_from_directory(
         predict_data_dir,

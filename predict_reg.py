@@ -16,7 +16,7 @@ def predict(model, train_config, predict_data_dir, num_predict_samples, batch_si
     img_height = train_config['img_height']
     img_width = train_config['img_width']
 
-    predict_datagen = ImageDataGenerator(rescale=1. / 255)
+    predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     predict_generator = predict_datagen.flow_from_directory(
         predict_data_dir,

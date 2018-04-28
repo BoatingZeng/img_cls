@@ -26,13 +26,14 @@ def train(model, train_config):
     model.compile(loss='mean_squared_error', optimizer=sgd, metrics=['mean_squared_error'])
 
     train_datagen = ImageDataGenerator(
+        samplewise_center=True,
         rotation_range=360,  # 用于眼球图片
         rescale=1. / 255,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True)
 
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    test_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
     train_generator = train_datagen.flow_from_directory(
         train_data_dir,
