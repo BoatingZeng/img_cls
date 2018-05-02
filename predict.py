@@ -80,7 +80,9 @@ def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples,
     if has_true_class:
         re_frame['true_class'] = true_cls_list
         header.append('true_class')
-
+    if not has_true_class:
+        result_path, _ = os.path.splitext(result_path)
+        result_path = result_path + '.test.csv'
     re_frame = re_frame[header]
     re_frame.to_csv(result_path, index=False)
 
@@ -90,7 +92,7 @@ parser.add_argument('-tcp', '--train_config_path', type=str, default='train_conf
 parser.add_argument('-pdd', '--predict_data_dir', type=str, default=None)
 parser.add_argument('-nps', '--num_predict_samples', type=int, default=64)
 parser.add_argument('-bs', '--batch_size', type=int, default=2)
-parser.add_argument('--task', type=str, default='driver')
+parser.add_argument('--task', type=str, default='diabetic')
 
 args = parser.parse_args()
 
