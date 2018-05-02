@@ -80,9 +80,53 @@ def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples,
     if has_true_class:
         re_frame['true_class'] = true_cls_list
         header.append('true_class')
-    if not has_true_class:
-        result_path, _ = os.path.splitext(result_path)
-        result_path = result_path + '.test.csv'
+
+    re_frame = re_frame[header]
+    re_frame.to_csv(result_path, index=False)
+
+
+def predict_diabetic_prob(model, train_config, predict_data_dir, num_predict_samples, batch_size, result_path):
+    if len(os.listdir(predict_data_dir)) == train_config['class_num']:
+        has_true_class = True
+    else:
+        has_true_class = False
+
+    img_height = train_config['img_height']
+    img_width = train_config['img_width']
+
+    predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
+
+    predict_generator = predict_datagen.flow_from_directory(
+        predict_data_dir,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode=None,
+        shuffle=False)
+    steps = num_predict_samples // batch_size
+    results = model.predict_generator(predict_generator, steps=steps, verbose=1)
+
+    columns = ['not_ill', 'ill']
+    re_frame = pd.DataFrame(results, columns=columns)
+
+    filenames = predict_generator.filenames
+    img_names = []
+    true_cls_list = []
+    for i in range(steps * batch_size):
+        path_name = filenames[i]
+        name = os.path.basename(path_name)
+        if has_true_class:
+            true_class = int(os.path.basename(os.path.dirname(path_name)))
+            true_cls_list.append(true_class)
+        # 不要后缀
+        name, _ = os.path.splitext(name)
+        img_names.append(name)
+
+    re_frame['image'] = img_names
+    header = ['image', 'not_ill', 'ill']
+    if has_true_class:
+        re_frame['true_class'] = true_cls_list
+        header.append('true_class')
+
     re_frame = re_frame[header]
     re_frame.to_csv(result_path, index=False)
 
@@ -93,6 +137,7 @@ parser.add_argument('-pdd', '--predict_data_dir', type=str, default=None)
 parser.add_argument('-nps', '--num_predict_samples', type=int, default=64)
 parser.add_argument('-bs', '--batch_size', type=int, default=2)
 parser.add_argument('--task', type=str, default='diabetic')
+parser.add_argument('-rp', '--result_path', type=str, default='result.csv')
 
 args = parser.parse_args()
 
@@ -112,10 +157,12 @@ elif model_type == 'resnet50':
 else:
     raise ValueError('model_type error!')
 
-result_path = weights_path + '.' + 'result.csv'
+result_path = args.result_path
 if args.task == 'driver':
     predict_driver(model, train_config, args.predict_data_dir, args.num_predict_samples, args.batch_size, result_path)
 elif args.task == 'diabetic':
     predict_diabetic(model, train_config, args.predict_data_dir, args.num_predict_samples, args.batch_size, result_path)
+elif args.task == 'diabetic_prob':
+    predict_diabetic_prob(model, train_config, args.predict_data_dir, args.num_predict_samples, args.batch_size, result_path)
 else:
     raise ValueError('check task name')
