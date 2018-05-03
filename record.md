@@ -107,10 +107,13 @@ model = Model(inputs=base_model.input, outputs=x, name='vgg16_reg')
 **注意的问题**
 
 1. 训练时要先冻结输出层以外的参数，先单独训练输出层，这个操作是为了避免随机初始化的输出层参数在梯度下降时对前面的参数造成过大的破坏，至于训练多久，看情况，感觉模型分数没什么变化，就可以停了
-2. 训练其他层，在这个代码中，是通过config里的train_layers设置的(参考train_vgg16_config.json.example文件)，在train_layers列表里的block是会被训练的。block的含义要看vgg16的模型描述，可以参考keras代码：https://github.com/keras-team/keras/blob/master/keras/applications/vgg16.py
+2. 训练其他层，在这个代码中，是通过config里的train_layers设置的(参考train_vgg16_config.json.example文件)，在train_layers列表里的block是会被训练的(其余block会被冻结，输出层任何情况下都会被训练)。block的含义要看vgg16的模型描述，可以参考keras代码：https://github.com/keras-team/keras/blob/master/keras/applications/vgg16.py
 3. 经过测试，猫狗辨别问题和开头提到的司机行为检测问题，只要训练block5(输出层是必须训练的)就可以得到不错的结果(准确率95%)，但是糖网检测只训练block5结果不理想，所以直接训练全部。当然，初始参数都是基于imageNet训练出来的参数的
 
-# 二分类结果
+# 样本不平衡的处理
+使用keras的class_weight，做分类时，class_weight设置为每个类所占比例的反比，比如有病没病二分类，训练集里无病(0)样本20,682，有病(5)样本7,488，那么0类和5类的class_weight分别设置为1.0和3.0
+
+# 有病没病二分类结果
 把有病的1、2、3、4类放在一起，当作一类，然后和没病的0一起做二分类
 
 ## 说明

@@ -20,6 +20,7 @@ def train(model, train_config):
     num_validation_samples = train_config['num_validation_samples']
     epochs = train_config['epochs']
     weights_path = train_config['weights_path']
+    class_weight = train_config['class_weight']
 
 
     sgd = SGD(lr=lr, momentum=momentum, nesterov=True)
@@ -61,7 +62,8 @@ def train(model, train_config):
         epochs=epochs,
         validation_data=validation_generator,
         validation_steps=num_validation_samples // batch_size,
-        callbacks=[checkpointer])
+        callbacks=[checkpointer],
+        class_weight=class_weight)
 
 
 parser = argparse.ArgumentParser()
