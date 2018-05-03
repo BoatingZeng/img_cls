@@ -1,7 +1,7 @@
 # 一些链接
 * 代码地址：https://github.com/BoatingZeng/img_cls
 * kaggle比赛地址：https://www.kaggle.com/c/diabetic-retinopathy-detection
-* 结果可以直接看：https://github.com/BoatingZeng/img_cls/example_data
+* 结果数据示例可以直接看example_data目录
 
 # 二分类结果
 

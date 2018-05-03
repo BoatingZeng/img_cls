@@ -1,1 +1,1 @@
-分析过程看：https://github.com/BoatingZeng/img_cls/record.md
+分析过程看record.md文件
