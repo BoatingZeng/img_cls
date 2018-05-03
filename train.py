@@ -11,6 +11,7 @@ from models import vgg16, resnet50
 def train(model, train_config):
     lr = train_config['lr']
     momentum = train_config['momentum']
+    decay = train_config['decay']
     train_data_dir = train_config['train_data_dir']
     validation_data_dir = train_config['validation_data_dir']
     img_height = train_config['img_height']
@@ -22,7 +23,7 @@ def train(model, train_config):
     weights_path = train_config['weights_path']
     class_weight = train_config['class_weight']
 
-    sgd = SGD(lr=lr, momentum=momentum, nesterov=True)
+    sgd = SGD(lr=lr, momentum=momentum, decay=decay, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
     train_datagen = ImageDataGenerator(

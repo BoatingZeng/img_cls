@@ -1,6 +1,7 @@
 {
   "lr": 1e-4,
   "momentum": 0.9,
+  "decay": 0.0,
   "train_data_dir": "E:/work/data/driver_detection/train",
   "validation_data_dir": "E:/work/data/driver_detection/validation",
   "img_height": 224,
