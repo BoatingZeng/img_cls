@@ -136,7 +136,7 @@ parser.add_argument('-tcp', '--train_config_path', type=str, default='train_conf
 parser.add_argument('-pdd', '--predict_data_dir', type=str, default=None)
 parser.add_argument('-nps', '--num_predict_samples', type=int, default=64)
 parser.add_argument('-bs', '--batch_size', type=int, default=2)
-parser.add_argument('--task', type=str, default='diabetic')
+parser.add_argument('--task', type=str, default='diabetic_prob')
 parser.add_argument('-rp', '--result_path', type=str, default='result.csv')
 
 args = parser.parse_args()

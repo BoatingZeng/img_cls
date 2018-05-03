@@ -14,7 +14,7 @@
 
 # 数据的处理示例代码
 
-```py
+```python
 import pandas as pd
 from analyze import confuse_matrix, roc, prc  # analyze是项目下的analyze.py文件
 
