@@ -59,6 +59,7 @@ def split_dia_data(src, des, lable_path):
         os.mkdir(os.path.join(des, cls))
 
     lables = pd.read_csv(lable_path)
+    miss_count = 0
     for row in lables.values:
         img_name = row[0]+'.jpeg'
         cls = str(row[1])
@@ -66,6 +67,11 @@ def split_dia_data(src, des, lable_path):
         if os.path.exists(src_img_path):
             des_img_path = os.path.join(des, cls, img_name)
             shutil.move(src_img_path, des_img_path)
+        else:
+            miss_count += 1
+            print(src_img_path)
+    if miss_count > 0:
+        print('以上文件不存在，总数：{0}'.format(miss_count))
 
 
 def scaleRadius(img, scale):
