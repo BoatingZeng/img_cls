@@ -1,5 +1,10 @@
 # 示例数据说明
 
+## 官方正确结果
+* trainLabels.csv：比赛官方给出的训练集的label
+* testLabels.csv：比赛后有人把测试集的标准答案放出来了，来源不明，经过测试(上传这个答案可以拿满分)，是正确的
+
+## 二分类结果
 * vgg16_2_cls_val_prob.csv：验证集上的预测结果
     * image：图片名字，不带后缀
     * not_ill：该例是没病的分数(概率，score)
@@ -11,8 +16,14 @@
 * val_prc_curve.png：画出来的prc曲线(验证集上的结果)
 * test_prc_curve.png：测试集上的prc曲线
 * test_roc_curve.png：测试集上的roc曲线
-* trainLabels.csv：比赛官方给出的训练集的label
-* testLabels.csv：比赛后有人把测试集的标准答案放出来了，来源不明，经过测试(上传这个答案可以拿满分)，是正确的
+
+## 有病案例四分类结果
+* vgg16_4_cls.val.result.csv：验证集上的预测结果
+    * image：图片名字
+    * 1、2、3、4：预测的4个类的score
+    * true_class：该例的真实分类
+* val_4_cls_?_roc_data.csv：(? = [1,2,3,4])，4个分类的roc曲线数据
+* val_4_cls_roc_curve.png：把4个分类的roc曲线画在一起
 
 # 数据的处理示例代码
 
