@@ -8,7 +8,7 @@ from models import vgg16_reg
 
 
 def predict(model, train_config, predict_data_dir, num_predict_samples, batch_size, result_path):
-    if len(os.listdir(predict_data_dir)) == 5:
+    if len(os.listdir(predict_data_dir)) == train_config['class_num']:
         has_true_class = True
     else:
         has_true_class = False

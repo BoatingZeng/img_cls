@@ -86,13 +86,23 @@ def predict_diabetic(model, train_config, predict_data_dir, num_predict_samples,
 
 
 def predict_diabetic_prob(model, train_config, predict_data_dir, num_predict_samples, batch_size, result_path):
-    if len(os.listdir(predict_data_dir)) == train_config['class_num']:
+    class_num = train_config['class_num']
+    if len(os.listdir(predict_data_dir)) == class_num:
         has_true_class = True
     else:
         has_true_class = False
 
     img_height = train_config['img_height']
     img_width = train_config['img_width']
+
+    if class_num == 2:
+        columns = ['not_ill', 'ill']
+    elif class_num == 4:
+        columns = ['1', '2', '3', '4']
+    else:
+        raise ValueError('class_num error')
+
+    header = ['image'].extend(columns)
 
     predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
@@ -105,7 +115,6 @@ def predict_diabetic_prob(model, train_config, predict_data_dir, num_predict_sam
     steps = num_predict_samples // batch_size
     results = model.predict_generator(predict_generator, steps=steps, verbose=1)
 
-    columns = ['not_ill', 'ill']
     re_frame = pd.DataFrame(results, columns=columns)
 
     filenames = predict_generator.filenames
@@ -122,7 +131,7 @@ def predict_diabetic_prob(model, train_config, predict_data_dir, num_predict_sam
         img_names.append(name)
 
     re_frame['image'] = img_names
-    header = ['image', 'not_ill', 'ill']
+
     if has_true_class:
         re_frame['true_class'] = true_cls_list
         header.append('true_class')
