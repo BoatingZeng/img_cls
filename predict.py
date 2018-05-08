@@ -102,7 +102,8 @@ def predict_diabetic_prob(model, train_config, predict_data_dir, num_predict_sam
     else:
         raise ValueError('class_num error')
 
-    header = ['image'].extend(columns)
+    header = ['image']
+    header.extend(columns)
 
     predict_datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
 
