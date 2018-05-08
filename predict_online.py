@@ -4,6 +4,8 @@ import os
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 import tempfile
 import json
+from wsgiref.simple_server import make_server
+import cgi
 
 from models import vgg16
 
@@ -75,3 +77,63 @@ class Predictor:
             result = result_4_cls
 
         return result
+
+
+p = Predictor('predict_online_config.json')
+
+
+def application(environ, start_response):
+    if environ['REQUEST_METHOD'] == 'POST':
+        # 保存upload上来的文件
+        fields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ, keep_blank_values=1)
+        fileitem = fields['file']
+        fn = os.path.basename(fileitem.filename)
+        up_file = os.path.join(p.tem_dir, fn)
+        f = open(up_file, 'wb')
+        f.write(fileitem.file.read())
+        f.close()
+
+        # 读取刚才upload的文件并预测
+        img = cv2.imread(up_file)
+        result = p.do_predict(img)
+
+        # 删除upload的文件
+        os.remove(up_file)
+
+        if result == 0:
+            color = 1
+        else:
+            color = 2
+        data = {
+            "data": [
+                {
+                    "status": color,
+                    "text": str(result),
+                    "label": "result"
+                },
+                {
+                    "status": color,
+                    "text": "60%",
+                    "label": "rate"
+                }
+            ]
+        }
+        content_type = 'application/json'
+        body = json.dumps(data)
+    else:
+        content_type = 'text/html;charset=UTF-8'
+        body = '<form id="upload" name="upload" method="POST" enctype="multipart/form-data">' \
+               '<input type="file" name="file" />' \
+               '<input type="submit" value="提交">' \
+               '</form>'
+
+    status = '200 OK'
+    start_response(status, [('Content-Type', content_type)])
+
+    return [body.encode('utf-8')]
+
+
+httpd = make_server('', 8000, application)
+print('Serving HTTP on port 8000...')
+# 开始监听HTTP请求:
+httpd.serve_forever()
