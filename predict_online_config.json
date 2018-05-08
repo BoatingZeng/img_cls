@@ -1,0 +1,7 @@
+{
+  "img_height": 512,
+  "img_width": 512,
+  "weights_path_2_cls": "weights/vgg16_2_cls_diabetic.h5",
+  "weights_path_4_cls": "weights/vgg16_4_cls_diabetic.h5",
+  "tem_dir": "/temp"
+}
