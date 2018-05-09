@@ -1,7 +1,4 @@
 import cv2
-import os
-import json
-import io
 import numpy as np
 from flask import Flask, jsonify
 from flask import request
