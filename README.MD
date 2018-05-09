@@ -4,8 +4,13 @@ kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy
 
 # predict_online的使用方法
 ```
-python3 predict_online.py -cp predict_online_config.json
+python3 predict_online.py -cp predict_online_config.json -gf 0.5
 ```
+
+命令参数说明：
+
+* --config_path(-cp)：配置路径
+* --gpu_fraction(-gf)：初始gpu占用率，设置了allow_growth=True，如果有需要，还会涨，如果不允许上涨的话，不够用就会死掉
 
 predict_online_config.json.example的说明：
 
