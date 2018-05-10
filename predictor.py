@@ -1,15 +1,14 @@
 import cv2
 import numpy as np
-from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
 import tempfile
-import json
 import os
 import tensorflow as tf
 
 from models import vgg16
 
 
-def process_img(img, scale=300, output_shape=(512, 512), tempdir='/temp'):
+def process_img(img, scale=300, output_shape=(512, 512)):
 
     x = img[img.shape[0] // 2, :, :].sum(1)
     r = (x > x.mean() / 10).sum() / 2
@@ -27,20 +26,27 @@ def process_img(img, scale=300, output_shape=(512, 512), tempdir='/temp'):
     a = a[:, (width - height) // 2:(width + height) // 2, :]
 
     # 把图片保存到临时目录
-    fd, tem = tempfile.mkstemp(suffix='.jpeg', dir=tempdir)
-    cv2.imwrite(tem, a)
+    # fd, tem = tempfile.mkstemp(suffix='.jpeg', dir=tempdir)
+    # cv2.imwrite(tem, a)
 
     # 用keras的api读取并且处理刚才的图片
-    a = load_img(tem, target_size=output_shape)
-    datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
+    # a = load_img(tem, target_size=output_shape)
+
+    # 不用临时文件
+    a = a[..., ::-1]
+    a = array_to_img(a, scale=False).resize(output_shape)
     a = img_to_array(a, data_format='channels_last')
+
+    # 用keras的api正则化
+    datagen = ImageDataGenerator(samplewise_center=True, rescale=1. / 255)
     a = datagen.standardize(a)
 
     # 变成(batch_size, height, width, channel)，batch_size=1
     a = np.expand_dims(a, axis=0)
+
     # 记得删除临时图片
-    os.close(fd)
-    os.remove(tem)
+    # os.close(fd)
+    # os.remove(tem)
     return a
 
 
@@ -55,14 +61,13 @@ class Predictor:
         self.img_height = config['img_height']
         self.img_width = config['img_width']
 
-        self.tem_dir = config['tem_dir']
         self.graph = tf.get_default_graph()
 
         self.model_2_cls = vgg16(input_shape=(self.img_height, self.img_width, 3), class_num=2, weights_path=weights_path_2_cls)
         self.model_4_cls = vgg16(input_shape=(self.img_height, self.img_width, 3), class_num=4, weights_path=weights_path_4_cls)
 
     def do_predict(self, img):
-        img = process_img(img, output_shape=(self.img_height, self.img_width), tempdir=self.tem_dir)
+        img = process_img(img, output_shape=(self.img_height, self.img_width))
         with self.graph.as_default():
             result_2_cls = self.model_2_cls.predict(img, batch_size=1)[0]
             result_4_cls = self.model_4_cls.predict(img, batch_size=1)[0]
