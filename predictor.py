@@ -44,14 +44,11 @@ def process_img(img, scale=300, output_shape=(512, 512), tempdir='/temp'):
     return a
 
 
-# p = Predictor('predict_online_config.json')
+# p = Predictor(config)
 # img = cv2.imread('E:/work/data/Diabetic_Retinopathy_Detection/sample/all/13_left.jpeg')
 # p.do_predict(img) 返回0、1、2、3、4
 class Predictor:
-    def __init__(self, config_path):
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-
+    def __init__(self, config):
         weights_path_2_cls = config['weights_path_2_cls']
         weights_path_4_cls = config['weights_path_4_cls']
 

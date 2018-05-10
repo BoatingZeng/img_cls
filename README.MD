@@ -9,14 +9,15 @@ python3 predict_online.py -cp predict_online_config.json -gf 0.5
 
 命令参数说明：
 
-* --config_path(-cp)：配置路径
-* --gpu_fraction(-gf)：初始gpu占用率，设置了allow_growth=True，如果有需要，还会涨，如果不允许上涨的话，不够用就会死掉
+* --config_path(-cp)：配置文件路径
 
 predict_online_config.json.example的说明：
 
 * img_height、img_width：这个是cnn接受的图片大小，传过来的图片会被处理成这个大小。这两个值要跟训练出来的weights配对。
 * weights_path_2_cls、weights_path_4_cls：训练出来的weights路径。使用了两个模型来进行预测，二分类判别是否有病，四分类判别程度。
-* tem_dir：临时文件路径，填`null`就是系统默认。中间要保存一次cv2的图片然后再读取，所以需要临时文件，预测后就会删除。
+* tem_dir：临时文件目录路径，填`null`就是系统默认。中间要保存一次cv2的图片然后再读取，所以需要临时文件，预测后就会删除。
+* gpu_fraction：初始gpu占用率，设置了allow_growth=True，如果有需要，还会涨，如果不允许上涨的话，不够用就会死掉
+* port：server端口
 
 训练好的weights：https://pan.baidu.com/s/1y9V2NQuX-o38wh5BP063Jw 
 

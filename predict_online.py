@@ -3,6 +3,7 @@ import numpy as np
 from flask import Flask, jsonify
 from flask import request
 import argparse
+import json
 import tensorflow as tf
 import keras.backend.tensorflow_backend as ktf
 
@@ -58,10 +59,12 @@ def get_session(gpu_fraction=0.5):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-cp', '--config_path', type=str, default='predict_online_config.json')
-    parser.add_argument('-gf', '--gpu_fraction', type=float, default=0.5)
     args = parser.parse_args()
 
-    ktf.set_session(get_session(args.gpu_fraction))
+    with open(args.config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
 
-    p = Predictor(args.config_path)
-    app.run()
+    ktf.set_session(get_session(config['gpu_fraction']))
+
+    p = Predictor(config)
+    app.run(port=config['port'])
