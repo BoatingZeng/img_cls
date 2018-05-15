@@ -4,7 +4,7 @@ kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy
 
 # predict_online的使用方法
 ```
-python3 predict_online.py -cp predict_online_config.json -gf 0.5
+python3 predict_online.py -cp predict_online_config.json
 ```
 
 命令参数说明：

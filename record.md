@@ -259,3 +259,12 @@ threshold |Private Score|recall in val|accuracy
 * Private Score：这个比赛的评价分数，评价准则是quadratic weighted kappa，因为我们有正确答案，所以可以用这个api来计算：`sklearn.metrics.cohen_kappa_score`
 * recall in val：设置这个阀值时，在验证集中，正例(有病)的召回率
 * accuracy：总体准确率，因为有测试集的正确答案，所以可以线下计算这个值
+
+# resnet的尝试
+
+## resnet50
+网络结构完全没有修改，只把imagenet那个1000的输出层改成4，去训练四分类。包括输入图片大小在内的其他条件都跟上面的一样。resnet50是按照stage来命名网络的，分别是stage1到5。5是靠近输出层的部分。另外，训练时，整个网络的BN(batch normalization)层都是要训练的。训练用的显卡是1070ti(显存8G)，输入图片大小是512*512，batch size设置成4(设置成8就不行了)。
+
+1. 只训练stage5，冻结前面的stage，这样训练出来，准确率只有63%左右
+2. 如果训练stage4、stage5，就会出现明显的过拟合，训练集上可以到80%，但是验证集上只有60%，无意义
+3. 整个网络训练，也是过拟合，无意义，分数和只训练stage4、stage5差不多

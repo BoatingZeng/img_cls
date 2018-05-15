@@ -34,7 +34,7 @@ def process_img(img, scale=300, output_shape=(512, 512)):
 
     # 不用临时文件
     a = a[..., ::-1]
-    a = array_to_img(a, scale=False).resize(output_shape)
+    a = array_to_img(a, data_format='channels_last', scale=False).resize(output_shape)
     a = img_to_array(a, data_format='channels_last')
 
     # 用keras的api正则化
