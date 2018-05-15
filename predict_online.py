@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from flask import Flask, jsonify
@@ -10,7 +11,34 @@ import keras.backend.tensorflow_backend as ktf
 
 from predictor import Predictor
 
-p = None
+# 读取配置文件
+parser = argparse.ArgumentParser()
+parser.add_argument('-cp', '--config_path', type=str, default='predict_online_config.json')
+args = parser.parse_args()
+
+with open(args.config_path, 'r', encoding='utf-8') as f:
+    config = json.load(f)
+
+# 如果设置gpu_fraction为0，表示不用gpu
+if config['gpu_fraction'] == 0:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+
+def get_session(gpu_fraction=0.5):
+    if gpu_fraction == 0:
+        return tf.Session(config=tf.ConfigProto())
+    else:
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction,
+                                    allow_growth=True)
+        return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
+
+ktf.set_session(get_session(config['gpu_fraction']))
+
+# 构造Predictor
+p = Predictor(config)
+
+# Flask服务器部分
 app = Flask(__name__)
 
 
@@ -50,21 +78,4 @@ def upload():
     return jsonify(data)
 
 
-def get_session(gpu_fraction=0.5):
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction,
-                                allow_growth=True)
-    return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-cp', '--config_path', type=str, default='predict_online_config.json')
-    args = parser.parse_args()
-
-    with open(args.config_path, 'r', encoding='utf-8') as f:
-        config = json.load(f)
-
-    ktf.set_session(get_session(config['gpu_fraction']))
-
-    p = Predictor(config)
-    app.run(port=config['port'])
+app.run(port=config['port'])
