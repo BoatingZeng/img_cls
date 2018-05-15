@@ -2,6 +2,16 @@
 
 kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy-detection
 
+# 依赖版本
+测试环境的依赖版本，其他环境未测试
+
+* python：3.6
+* TensorFlow(GPU版本)：1.7.0
+* Keras：2.1.3
+* numpy：1.14.2
+* cv2：3.4.0
+* flask：1.0.2
+
 # predict_online的使用方法
 ```
 python3 predict_online.py -cp predict_online_config.json
