@@ -4,6 +4,9 @@ import random
 import pandas as pd
 import cv2, glob
 import numpy as np
+import tensorflow as tf
+import json
+from models import vgg16
 
 
 # import and use in python console
@@ -113,3 +116,18 @@ def preprocess_img(src, des, scale=300):
             except:
                 print(f)
 
+
+# 把model保存成protocol buffer格式(包含参数)
+def save_freeze_model(model_config_path, name):
+    with open(model_config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+
+    with tf.Session() as sess:
+        if config['model_type'] == 'vgg16':
+            model = vgg16(input_shape=(config['img_height'], config['img_width'], 3), class_num=config['class_num'], weights_path=config['weights_path'])
+        else:
+            raise ValueError('model_type error!')
+
+        graph_def = sess.graph.as_graph_def()
+        graph_def = tf.graph_util.convert_variables_to_constants(sess, graph_def, [node.op.name for node in model.outputs])
+        tf.train.write_graph(graph_or_graph_def=graph_def, logdir='.', name=name, as_text=False)
