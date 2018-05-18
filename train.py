@@ -4,8 +4,9 @@ import json
 from keras.callbacks import ModelCheckpoint
 import argparse
 import os
+from keras.layers.normalization import BatchNormalization
 
-from models import vgg16, resnet50
+from models import vgg16, resnet50, xception
 
 
 def train(model, train_config):
@@ -120,7 +121,7 @@ elif model_type == 'resnet50':
         if layer.name.find('output') == 0:
             # 不冻结输出层
             continue
-        if layer.name.find('bn') == 0:
+        if type(layer) == BatchNormalization:
             # batch normalization 层不可以冻结
             continue
 
@@ -133,6 +134,20 @@ elif model_type == 'resnet50':
             continue
 
         layer.trainable = False
+
+elif model_type == 'xception':
+    model = xception(input_shape=(train_config['img_height'], train_config['img_width'], 3),
+                     class_num=train_config['class_num'], weights_path=weights_path)
+    train_layer = train_config['train_layers']
+
+    if 'only_top' in train_layer:
+        for layer in model.layers:
+            if layer.name.find('output') == 0:
+                continue
+            if type(layer) == BatchNormalization:
+                continue
+
+            layer.trainable = False
 
 else:
     raise ValueError('model_type error!')
