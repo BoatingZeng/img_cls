@@ -78,4 +78,4 @@ def upload():
     return jsonify(data)
 
 
-app.run(port=config['port'])
+app.run(port=config['port'], host='0.0.0.0')

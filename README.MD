@@ -6,11 +6,14 @@ kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy
 测试环境的依赖版本，其他环境未测试
 
 * python：3.6
-* TensorFlow(GPU版本)：1.7.0
+* TensorFlow：1.7.0
 * Keras：2.1.3
 * numpy：1.14.2
-* cv2：3.4.0
+* cv2(opencv)：3.4.0
 * flask：1.0.2
+* Pillow: 5.0.0
+
+备注：如果使用GPU版本的TensorFlow，需要安装cuda，直接只安装Keras的话，默认安装CPU版本的TensorFlow
 
 # predict_online的使用方法
 ```
