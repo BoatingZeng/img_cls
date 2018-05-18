@@ -17,6 +17,11 @@ kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy
 python3 predict_online.py -cp predict_online_config.json
 ```
 
+测试URL：
+
+* localhost:5000/：用于上传图片的表单页面
+* localhost:5000/upload：上传图片的URL(POST)
+
 命令参数说明：
 
 * --config_path(-cp)：配置文件路径
