@@ -109,7 +109,10 @@ def preprocess_img(src, des, scale=300):
                 # to square
                 height = a.shape[0]
                 width = a.shape[1]
-                a = a[:, (width-height)//2:(width+height)//2, :]
+                if height < width:
+                    a = a[:, (width - height) // 2:(width + height) // 2, :]
+                else:
+                    a = a[(height - width) // 2:(width + height) // 2, :, :]
                 basename = os.path.basename(f)
                 newpath = os.path.join(new_class_dir, basename)
                 cv2.imwrite(newpath, a)

@@ -23,7 +23,10 @@ def process_img(img, scale=300, output_shape=(512, 512)):
 
     height = a.shape[0]
     width = a.shape[1]
-    a = a[:, (width - height) // 2:(width + height) // 2, :]
+    if height < width:
+        a = a[:, (width - height) // 2:(width + height) // 2, :]
+    else:
+        a = a[(height - width) // 2:(width + height) // 2, :, :]
 
     # 把图片保存到临时目录
     # fd, tem = tempfile.mkstemp(suffix='.jpeg', dir=tempdir)
