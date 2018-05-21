@@ -1,6 +1,7 @@
 {
   "img_height": 512,
   "img_width": 512,
+  "threshold_2_cls": 0.5,
   "weights_path_2_cls": "weights/vgg16_2_cls_diabetic.h5",
   "weights_path_4_cls": "weights/vgg16_4_cls_diabetic.h5",
   "gpu_fraction": 0.5,

@@ -55,7 +55,7 @@ def upload():
     # 直接从流里读取图片
     stream = request.files['file'].read()
     img = cv2.imdecode(np.fromstring(stream, np.uint8), cv2.IMREAD_COLOR)
-    result, rate = p.do_predict(img)
+    result, rate = p.do_predict(img, config['threshold_2_cls'])
 
     if result == 0:
         color = 1

@@ -69,7 +69,7 @@ class Predictor:
         self.model_2_cls = vgg16(input_shape=(self.img_height, self.img_width, 3), class_num=2, weights_path=weights_path_2_cls)
         self.model_4_cls = vgg16(input_shape=(self.img_height, self.img_width, 3), class_num=4, weights_path=weights_path_4_cls)
 
-    def do_predict(self, img):
+    def do_predict(self, img, threshold_2_cls=0.5):
         img = process_img(img, output_shape=(self.img_height, self.img_width))
         with self.graph.as_default():
             result_2_cls = self.model_2_cls.predict(img, batch_size=1)[0]
@@ -78,8 +78,11 @@ class Predictor:
         healthy_rate = result_2_cls[0]
         ill_rate = result_2_cls[1]
 
-        # 二分类就用threshold=0.5
-        result_2_cls = int(result_2_cls.argmax())
+        if ill_rate > threshold_2_cls:
+            result_2_cls = 1
+        else:
+            result_2_cls = 0
+
         result_4_cls = int(result_4_cls.argmax()+1)
 
         if result_2_cls == 0:
