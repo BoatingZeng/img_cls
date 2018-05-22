@@ -73,7 +73,6 @@ class Predictor:
         img = process_img(img, output_shape=(self.img_height, self.img_width))
         with self.graph.as_default():
             result_2_cls = self.model_2_cls.predict(img, batch_size=1)[0]
-            result_4_cls = self.model_4_cls.predict(img, batch_size=1)[0]
 
         healthy_rate = result_2_cls[0]
         ill_rate = result_2_cls[1]
@@ -83,13 +82,15 @@ class Predictor:
         else:
             result_2_cls = 0
 
-        result_4_cls = int(result_4_cls.argmax()+1)
+        if result_2_cls == 1:
+            with self.graph.as_default():
+                result_4_cls = self.model_4_cls.predict(img, batch_size=1)[0]
 
-        if result_2_cls == 0:
-            result = result_2_cls
-            rate = healthy_rate
-        else:
+            result_4_cls = int(result_4_cls.argmax()+1)
             result = result_4_cls
             rate = ill_rate
+        else:
+            result = result_2_cls
+            rate = healthy_rate
 
         return result, rate
