@@ -6,7 +6,7 @@ import argparse
 import os
 from keras.layers.normalization import BatchNormalization
 
-from models import vgg16, resnet50, xception
+from models import vgg16, resnet50, xception, vgg16_large
 
 
 def train(model, train_config):
@@ -148,6 +148,26 @@ elif model_type == 'xception':
                 continue
 
             layer.trainable = False
+
+elif model_type == 'vgg16_large':
+    model = vgg16_large(input_shape=(train_config['img_height'], train_config['img_width'], 3),
+                  class_num=train_config['class_num'], weights_path=weights_path)
+    # 冻结不训练的层
+    for layer in model.layers:
+        if layer.name.find('output') == 0:
+            # 不冻结输出层
+            continue
+        # train_config['train_layers'] 可选 ["block1", "block2", "block3", "block4", "block5"]
+        is_match = False
+        for block_name in train_config['train_layers']:
+            if layer.name.find(block_name) == 0:
+                # 不冻结train_layers中设置的block
+                is_match = True
+                break
+        if is_match:
+            continue
+
+        layer.trainable = False
 
 else:
     raise ValueError('model_type error!')
