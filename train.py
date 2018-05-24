@@ -29,7 +29,7 @@ def train(model, train_config):
 
     train_datagen = ImageDataGenerator(
         samplewise_center=True,
-        rotation_range=360,  # 用于眼球图片
+        rotation_range=180,  # 用于眼球图片
         rescale=1. / 255,
         shear_range=0.2,
         zoom_range=0.2,
