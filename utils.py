@@ -4,9 +4,6 @@ import random
 import pandas as pd
 import cv2, glob
 import numpy as np
-import tensorflow as tf
-import json
-from models import vgg16
 
 
 # import and use in python console
@@ -120,17 +117,32 @@ def preprocess_img(src, des, scale=300):
                 print(f)
 
 
-# 把model保存成protocol buffer格式(包含参数)
-def save_freeze_model(model_config_path, name):
-    with open(model_config_path, 'r', encoding='utf-8') as f:
-        config = json.load(f)
+def crop_resize(src, des, target_size=1024):
+    if len(os.listdir(des)) != 0:
+        print('{0} is not empty'.format(des))
+        return
 
-    with tf.Session() as sess:
-        if config['model_type'] == 'vgg16':
-            model = vgg16(input_shape=(config['img_height'], config['img_width'], 3), class_num=config['class_num'], weights_path=config['weights_path'])
-        else:
-            raise ValueError('model_type error!')
+    classes = os.listdir(src)
 
-        graph_def = sess.graph.as_graph_def()
-        graph_def = tf.graph_util.convert_variables_to_constants(sess, graph_def, [node.op.name for node in model.outputs])
-        tf.train.write_graph(graph_or_graph_def=graph_def, logdir='.', name=name, as_text=False)
+    for cls in classes:
+        old_class_dir = os.path.join(src, cls)
+        new_class_dir = os.path.join(des, cls)
+        os.mkdir(new_class_dir)
+        for f in glob.glob(os.path.join(old_class_dir, '*.jpeg')):
+            try:
+                a = cv2.imread(f)
+                # resize
+                s = target_size / min(a.shape[0], a.shape[1])
+                a = cv2.resize(a, (0, 0), fx=s, fy=s)
+                # to square
+                height = a.shape[0]
+                width = a.shape[1]
+                if height < width:
+                    a = a[:, (width - height) // 2:(width + height) // 2, :]
+                else:
+                    a = a[(height - width) // 2:(width + height) // 2, :, :]
+                basename = os.path.basename(f)
+                newpath = os.path.join(new_class_dir, basename)
+                cv2.imwrite(newpath, a)
+            except:
+                print(f)
