@@ -14,5 +14,6 @@
   "model_type": "vgg16",
   "class_num": 10,
   "class_weight": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-  "train_layers": ["block1", "block2", "block3", "block4", "block5"]
+  "train_layers": ["block1", "block2", "block3", "block4", "block5"],
+  "leaky_alpha": 0.5
 }
