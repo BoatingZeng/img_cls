@@ -1,6 +1,7 @@
 from keras.applications import ResNet50, VGG16, Xception
 from keras.layers import Flatten, Dense, Dropout, GlobalAveragePooling2D, Input, Conv2D, MaxPooling2D, LeakyReLU
 from keras.models import Model
+from keras_contrib.applications.resnet import ResNet18
 
 import tensorflow as tf
 import json
@@ -40,6 +41,15 @@ def resnet50(input_shape=(224, 224, 3), class_num=2, weights_path=None):
     model = Model(inputs=base_model.input, outputs=x, name='resnet50_cls'+str(class_num))
     if weights_path is not None:
         print('load weights from: ' + weights_path)
+        model.load_weights(weights_path)
+
+    return model
+
+
+def resnet18(input_shape=(224, 224, 3), class_num=2, weights_path=None):
+    model = ResNet18(input_shape, class_num)
+
+    if weights_path is not None:
         model.load_weights(weights_path)
 
     return model

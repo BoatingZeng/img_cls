@@ -6,7 +6,7 @@ import argparse
 import os
 from keras.layers.normalization import BatchNormalization
 
-from models import vgg16, resnet50, xception, vgg16_large, vgg16_LeakyReLU
+from models import vgg16, resnet50, xception, vgg16_large, vgg16_LeakyReLU, resnet18
 
 
 def train(model, train_config):
@@ -135,6 +135,9 @@ elif model_type == 'resnet50':
             continue
 
         layer.trainable = False
+
+elif model_type == 'resnet18':
+    model = resnet18(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
 
 elif model_type == 'xception':
     model = xception(input_shape=(train_config['img_height'], train_config['img_width'], 3),
