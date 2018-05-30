@@ -289,3 +289,14 @@ table   |预测有病|预测无病|
 ROC曲线的AUC=0.8936。也是差不多(之前0.898)。
 
 以上这些差异，未必是Leaky ReLU带来的，因为就算用原本的ReLU继续训练原本的weights，也可能有浮动。
+
+# 关于quadratic cohen kappa 和准确率(accuracy)的对比
+之前猜测accuracy一定会比kappa高，但事实不然。取其中一个参赛者的结果，计算出的kappa=0.831，accuracy=0.805。
+
+某参赛者结果：https://kaggle2.blob.core.windows.net/forum-message-attachments/88677/2796/2015_07_27_182759_25_log_mean_rank.csv.zip
+
+另外，只考虑真实有病的样本并且预测有病的样本，该结果的accuracy=0.527，kappa=0.603。
+
+考虑该结果的二分类性能(查出是否有病的性能)，recall=0.759，precision=0.839。(比我得到的二分类模型好很多)
+
+**结论：二分类的性能才是关键**
