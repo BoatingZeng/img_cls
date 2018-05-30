@@ -263,11 +263,30 @@ threshold |Private Score|recall in val|accuracy
 # resnet的尝试
 
 ## resnet50
-网络结构完全没有修改，只把imagenet那个1000的输出层改成4，去训练四分类。包括输入图片大小在内的其他条件都跟上面的一样。resnet50是按照stage来命名网络的，分别是stage1到5。5是靠近输出层的部分。另外，训练时，整个网络的BN(batch normalization)层都是要训练的。训练用的显卡是1070ti(显存8G)，输入图片大小是512*512，batch size设置成4(设置成8就不行了)。
+~~网络结构完全没有修改，只把imagenet那个1000的输出层改成4，去训练四分类。包括输入图片大小在内的其他条件都跟上面的一样。resnet50是按照stage来命名网络的，分别是stage1到5。5是靠近输出层的部分。另外，训练时，整个网络的BN(batch normalization)层都是要训练的。训练用的显卡是1070ti(显存8G)，输入图片大小是512*512，batch size设置成4(设置成8就不行了)。~~
 
-1. 只训练stage5，冻结前面的stage，这样训练出来，准确率只有63%左右
-2. 如果训练stage4、stage5，就会出现明显的过拟合，训练集上可以到80%，但是验证集上只有60%，无意义
-3. 整个网络训练，也是过拟合，无意义，分数和只训练stage4、stage5差不多
+~~1. 只训练stage5，冻结前面的stage，这样训练出来，准确率只有63%左右~~
+~~2. 如果训练stage4、stage5，就会出现明显的过拟合，训练集上可以到80%，但是验证集上只有60%，无意义~~
+~~3. 整个网络训练，也是过拟合，无意义，分数和只训练stage4、stage5差不多~~
+
+**更正**
+
+错误用法：
+
+```python
+base_model = ResNet50(weights=weights, include_top=False, input_shape=input_shape)
+x = Flatten(name='output_flatten')(base_model.output)
+x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(x)
+```
+
+如果input_size不是(224, 224, 3)，上面使用resnet50的方法是不对的。原本的Imagenet网络输入是224x224，所以keras里resnet50最后的`x = AveragePooling2D((7, 7), name='avg_pool')(x)`就相当于Global Average Pooling(GAP)(因为最后一个卷积层的输出就是7x7，经过7x7的pooling就刚好输出1x1)。但是如果input_size是(512, 512, 3)，最后一个卷积层输出的是16x16，经过7x7的pooling，就得到2x2(stride也是7x7)，所以并没有真正的做GAP。因此，需要设置`pooling='avg'`，显式在最后使用GAP，再接全连接层(这样做就不用再Flatten了，因为GAP就会做拉平)。
+
+正确用法：
+
+```python
+base_model = ResNet50(weights=weights, include_top=False, input_shape=input_shape, pooling='avg')
+x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(base_model.output)
+```
 
 # xception的尝试
 结构没修改，只把输出层换成4。同样是训练整个网络。和resnet50类似，会出现过拟合，没有训练到最后，不确定过拟合程度有多大。验证集的准确率60多，训练集70多。
