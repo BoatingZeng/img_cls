@@ -4,7 +4,7 @@ import argparse
 import os
 import pandas as pd
 
-from models import vgg16, resnet50, vgg16_LeakyReLU
+from models import vgg16, resnet50, vgg16_LeakyReLU, resnet18
 
 
 def predict_driver(model, train_config, predict_data_dir, num_predict_samples, batch_size, result_path):
@@ -164,6 +164,8 @@ if model_type == 'vgg16':
     model = vgg16(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
 elif model_type == 'resnet50':
     model = resnet50(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
+elif model_type == 'resnet18':
+    model = resnet18(input_shape=(train_config['img_height'], train_config['img_width'], 3), class_num=train_config['class_num'], weights_path=weights_path)
 elif model_type == 'vgg16_LeakyReLU':
     model = vgg16_LeakyReLU(input_shape=(train_config['img_height'], train_config['img_width'], 3),
                             class_num=train_config['class_num'], leaky_alpha=train_config['leaky_alpha'],
