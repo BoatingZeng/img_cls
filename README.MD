@@ -12,6 +12,7 @@ kaggle比赛地址(糖网检测)：https://www.kaggle.com/c/diabetic-retinopathy
 * cv2(opencv)：3.4.0
 * flask：1.0.2
 * Pillow: 5.0.0
+* keras-contrib：https://github.com/keras-team/keras-contrib
 
 备注：如果使用GPU版本的TensorFlow，需要安装cuda，直接只安装Keras的话，默认安装CPU版本的TensorFlow
 

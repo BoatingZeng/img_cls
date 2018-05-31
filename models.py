@@ -1,7 +1,7 @@
 from keras.applications import ResNet50, VGG16, Xception
 from keras.layers import Flatten, Dense, Dropout, GlobalAveragePooling2D, Input, Conv2D, MaxPooling2D, LeakyReLU
 from keras.models import Model
-from keras_contrib.applications.resnet import ResNet18
+from keras_contrib.applications.resnet import ResNet
 
 import tensorflow as tf
 import json
@@ -36,7 +36,7 @@ def resnet50(input_shape=(224, 224, 3), class_num=2, weights_path=None):
     base_model = ResNet50(weights=weights, include_top=False, input_shape=input_shape, pooling='avg')
 
     # x = Flatten(name='output_flatten')(base_model.output)
-    x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(base_model.output)
+    x = Dense(class_num, activation='softmax', kernel_initializer="he_normal", name='output_predictions_cls'+str(class_num))(base_model.output)
 
     model = Model(inputs=base_model.input, outputs=x, name='resnet50_cls'+str(class_num))
     if weights_path is not None:
@@ -47,7 +47,12 @@ def resnet50(input_shape=(224, 224, 3), class_num=2, weights_path=None):
 
 
 def resnet18(input_shape=(224, 224, 3), class_num=2, weights_path=None):
-    model = ResNet18(input_shape, class_num)
+    base_model = ResNet(input_shape, class_num, 'basic', repetitions=[2, 2, 2, 2], include_top=False)
+
+    x = GlobalAveragePooling2D()(base_model.output)
+    x = Dense(units=class_num, activation='softmax', kernel_initializer="he_normal", name='output_predictions_cls'+str(class_num))(x)
+
+    model = Model(inputs=base_model.input, outputs=x, name='resnet18_cls' + str(class_num))
 
     if weights_path is not None:
         model.load_weights(weights_path)
@@ -193,3 +198,5 @@ def save_freeze_model(model_config_path, name):
         graph_def = sess.graph.as_graph_def()
         graph_def = tf.graph_util.convert_variables_to_constants(sess, graph_def, [node.op.name for node in model.outputs])
         tf.train.write_graph(graph_or_graph_def=graph_def, logdir='.', name=name, as_text=False)
+m = resnet18()
+pass
