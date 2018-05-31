@@ -190,13 +190,22 @@ def save_freeze_model(model_config_path, name):
         config = json.load(f)
 
     with tf.Session() as sess:
-        if config['model_type'] == 'vgg16':
-            model = vgg16(input_shape=(config['img_height'], config['img_width'], 3), class_num=config['class_num'], weights_path=config['weights_path'])
+        model_type = config['model_type']
+        if model_type == 'vgg16':
+            model = vgg16(input_shape=(config['img_height'], config['img_width'], 3),
+                          class_num=config['class_num'], weights_path=config['weights_path'])
+
+        elif model_type == 'resnet50':
+            model = resnet50(input_shape=(config['img_height'], config['img_width'], 3),
+                             class_num=config['class_num'], weights_path=config['weights_path'])
+
+        elif model_type == 'resnet18':
+            model = resnet18(input_shape=(config['img_height'], config['img_width'], 3),
+                             class_num=config['class_num'], weights_path=config['weights_path'])
+
         else:
             raise ValueError('model_type error!')
 
         graph_def = sess.graph.as_graph_def()
         graph_def = tf.graph_util.convert_variables_to_constants(sess, graph_def, [node.op.name for node in model.outputs])
         tf.train.write_graph(graph_or_graph_def=graph_def, logdir='.', name=name, as_text=False)
-m = resnet18()
-pass

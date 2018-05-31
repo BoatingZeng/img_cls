@@ -42,6 +42,20 @@ predict_online_config.json.example的说明：
 备注：
 设置gpu_fraction为0，就不使用GPU，通过`os.environ['CUDA_VISIBLE_DEVICES'] = '-1'`实现。
 
+# predict_tf_online的使用方法
+和predict_online一样，配置文件的格式也一样。**不同点：配置的weights指向的是固化的ProtoBuffer文件(如vgg16_cls_2.pb)**。ProtoBuffer的生成方法见下面。它的好处是，不需要再依赖项目中的其他代码文件，尤其是models.py。因为一切模型信息都在ProtoBuffer里。
+
+# models.save_freeze_model的使用方法
+
+`save_freeze_model`会读取模型配置文件(vgg16_2_cls_config.json)，构建相应的模型，然后加载相应的weights，然后把全部variable变成constant，再和graph一起保存成ProtoBuffer。注意各种文件的路径(配置文件里还有个weights_path)。`vgg16_cls_2.pb`文件会保存到当前工作目录。
+
+```python
+from models import save_freeze_model
+model_config_path = 'vgg16_2_cls_config.json'
+name = 'vgg16_cls_2.pb'
+save_freeze_model(model_config_path, name)
+```
+
 训练好的weights：https://pan.baidu.com/s/1y9V2NQuX-o38wh5BP063Jw 
 
 密码：2fnx
