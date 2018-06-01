@@ -144,23 +144,8 @@ def upload():
     img = cv2.imdecode(np.fromstring(stream, np.uint8), cv2.IMREAD_COLOR)
     result, rate = p.do_predict(img, config['threshold_2_cls'])
 
-    if result == 0:
-        color = 1
-    else:
-        color = 2
     data = {
-        "data": [
-            {
-                "status": color,
-                "text": str(result),
-                "label": "result"
-            },
-            {
-                "status": color,
-                "text": "{0}%".format(int(rate*100)),
-                "label": "rate"
-            }
-        ]
+        "data": {"type": result}
     }
     return jsonify(data)
 
