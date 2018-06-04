@@ -288,6 +288,10 @@ base_model = ResNet50(weights=weights, include_top=False, input_shape=input_shap
 x = Dense(class_num, activation='softmax', name='output_predictions_cls'+str(class_num))(base_model.output)
 ```
 
+使用正确的代码训练resnet50，使用ImageNet的参数作为初始参数，在二分类问题上，得到的结果比vgg16低了几个百分点。
+
+不用预训练参数，从空白开始训练resnet18，一直等不到结果收敛(准确率始终在73%左右)，最后放弃了。
+
 # xception的尝试
 结构没修改，只把输出层换成4。同样是训练整个网络。和resnet50类似，会出现过拟合，没有训练到最后，不确定过拟合程度有多大。验证集的准确率60多，训练集70多。
 
